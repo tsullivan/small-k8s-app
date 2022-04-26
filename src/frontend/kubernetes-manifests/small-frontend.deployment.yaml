@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-smallapp-frontend
+  labels:
+    app: nodejs-smallapp
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-smallapp
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: nodejs-smallapp
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nodejs-smallapp-frontend
+        ports:
+        - name: http-server
+          containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: SMALLAPP_API_ADDR
+          value: nodejs-smallapp-backend:8080

@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-small-k8s",
+  "version": "1.0.0",
+  "description": "Small Application for Kubernetes",
+  "dependencies": {
+    "eslint": "8.12.0"
+  },
+  "scripts": {
+    "lint": "eslint 'src/**/**.js'"
+  },
+  "author": "Tim Sullivan"
+}
