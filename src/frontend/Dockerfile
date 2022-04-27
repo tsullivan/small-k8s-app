@@ -10,5 +10,8 @@ RUN npm install
 # Copy rest of the application csource code
 COPY . .
 
+# Compile the bundle
+RUN npm run build
+
 # Run app.js
-ENTRYPOINT ["node", "app.js"]
+ENTRYPOINT ["npx", "ts-node", "app.ts"]
