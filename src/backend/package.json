@@ -6,8 +6,6 @@
   "scripts": {
     "start": "node --inspect=9229 app.js"
   },
-  "author": "Google Inc.",
-  "license": "0BSD",
   "dependencies": {
     "body-parser": "1.20.0",
     "express": "4.17.3",
