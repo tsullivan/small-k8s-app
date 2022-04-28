@@ -7,10 +7,10 @@ import { first, map } from 'rxjs/operators';
 import { QuestionFormat } from './get_questions';
 
 interface FormTemplates {
-  askName: HTMLTemplateElement;
-  cardItem: HTMLTemplateElement;
-  hello: HTMLTemplateElement;
-  save: HTMLTemplateElement;
+  askName: HTMLTemplateElement | null;
+  cardItem: HTMLTemplateElement | null;
+  hello: HTMLTemplateElement | null;
+  save: HTMLTemplateElement | null;
 }
 
 export class FormDriver {
@@ -18,12 +18,16 @@ export class FormDriver {
   private templates: FormTemplates;
 
   constructor() {
-    this.cardsBody = document.querySelector('.cards')!;
+    const cardsBody = document.querySelector('.cards');
+    if (!cardsBody) {
+      throw new Error('Page error! cards container not found');
+    }
+    this.cardsBody = cardsBody;
     this.templates = {
-      askName: document.querySelector('#askNameTemplate')!,
-      cardItem: document.querySelector('#cardItemTemplate')!,
-      hello: document.querySelector('#helloTemplate')!,
-      save: document.querySelector('#saveTemplate')!,
+      askName: document.querySelector('#askNameTemplate'),
+      cardItem: document.querySelector('#cardItemTemplate'),
+      hello: document.querySelector('#helloTemplate'),
+      save: document.querySelector('#saveTemplate'),
     };
   }
 
@@ -31,9 +35,12 @@ export class FormDriver {
     this.cardsBody.innerHTML = '';
   }
 
-  public askName(): Observable<string> {
-    const clone = this.templates.askName.content.cloneNode(true) as ParentNode;
-    const [ answer, submit ] = Array.from(clone.querySelectorAll('input')!);
+  public askName(): Observable<string> | void {
+    const clone = this.templates?.askName?.content.cloneNode(true) as ParentNode | null;
+    if (!clone) {
+      return;
+    }
+    const [ answer, submit ] = Array.from(clone.querySelectorAll('input'));
     this.cardsBody.appendChild(clone);
 
     return fromEvent(submit, 'click').pipe(first(), map(() => {
@@ -43,8 +50,11 @@ export class FormDriver {
   }
 
   public addHello( name: string, startTime: Date,): void {
-    const clone = this.templates.hello.content.cloneNode(true) as ParentNode;
-    const p = clone.querySelectorAll('p')!;
+    const clone = this.templates.hello?.content.cloneNode(true) as ParentNode | null;
+    if (!clone) {
+      return;
+    }
+    const p = clone.querySelectorAll('p');
     p[0].innerText = `Hello, ${name}!`;
     p[1].innerText = `You started at ${startTime}`;
     this.cardsBody.append(clone);
@@ -52,8 +62,11 @@ export class FormDriver {
 
   public showNewQuestions(questions: Array<QuestionFormat>, size: number) {
     for (let i = 0; i < size; i++) {
-      const clone = this.templates.cardItem.content.cloneNode(true) as ParentNode;
-      const [ question ] = Array.from(clone.querySelectorAll('span.question')!);
+      const clone = this.templates.cardItem?.content.cloneNode(true) as ParentNode | null;
+      if (!clone) {
+        return;
+      }
+      const [ question ] = Array.from(clone.querySelectorAll('span.question'));
       const [ newFirst, operator, last ] = questions[i];
       question.textContent = `${newFirst} ${operator} ${last}`;
       this.cardsBody.appendChild(clone);
@@ -61,7 +74,10 @@ export class FormDriver {
   }
 
   public addSave() {
-    const clone = this.templates.save.content.cloneNode(true) as ParentNode;
+    const clone = this.templates.save?.content.cloneNode(true) as ParentNode | null;
+    if (!clone) {
+      return;
+    }
     this.cardsBody.append(clone);
   }
 }

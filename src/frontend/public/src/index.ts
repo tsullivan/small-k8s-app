@@ -21,7 +21,11 @@ async function main() {
   const state = new GameState();
 
   // Ask their name
-  state.name = await firstValueFrom(form.askName());
+  const name$ = form.askName();
+  if (!name$) {
+    throw new Error('an unrecoverable error has occurred.');
+  }
+  state.name = await firstValueFrom(name$);
 
   // Say hello
   form.clear();
