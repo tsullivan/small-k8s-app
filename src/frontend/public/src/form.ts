@@ -4,7 +4,7 @@
 
 import { Observable, fromEvent } from 'rxjs';
 import { first, map } from 'rxjs/operators';
-import { QuestionFormat } from './get_questions';
+import { QuestionFormat } from '../../types';
 
 interface FormTemplates {
   askName: HTMLTemplateElement | null;

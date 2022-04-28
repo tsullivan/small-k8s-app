@@ -1,8 +1,7 @@
 /*
  * This program was written by Tim Sullivan
  */
-
-export type QuestionFormat = [number, string, number];
+import { QuestionFormat } from '../../types';
 
 const OPERATORS = ['*', '+', '-'];
 

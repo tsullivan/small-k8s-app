@@ -14,4 +14,4 @@ COPY . .
 RUN npm run build
 
 # Run app.js
-ENTRYPOINT ["npx", "ts-node", "app.ts"]
+ENTRYPOINT ["npx", "ts-node", "app/index.ts"]

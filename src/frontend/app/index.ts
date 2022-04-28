@@ -1,35 +1,48 @@
 import axios from 'axios';
 import * as bodyParser from 'body-parser';
+import * as cookieParser from 'cookie-parser';
 import type { Request } from 'express';
 import * as express from 'express';
+import * as session from 'express-session';
 import * as path from 'path';
+import { checkEnvironment } from './env';
+import '../types';
 
+// initialize the app
 const app = express();
 
+const SMALLAPP_SESSION_SECRET = process.env.SMALLAPP_API_ADDR;
 const SMALLAPP_API_ADDR = process.env.SMALLAPP_API_ADDR;
 const BACKEND_URI = `http://${SMALLAPP_API_ADDR}/messages`;
+checkEnvironment();
 
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.resolve(__dirname, '..', 'views'));
 
-const router = express.Router();
-app.use(router);
+app.use(
+  session({
+    cookie: { maxAge: 86000 * 1000 },
+    resave: true,
+    saveUninitialized: true,
+    secret: SMALLAPP_SESSION_SECRET,
+  })
+);
 
-app.use(express.static('public'));
-router.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static(path.resolve(__dirname, '..', 'public')));
+app.use(express.urlencoded({ extended: true }));
 
-// Application will fail if environment variables are not set
-if (!process.env.PORT) {
-  const errMsg = 'PORT environment variable is not defined';
-  console.error(errMsg);
-  throw new Error(errMsg);
-}
+// give server option to save, read and access a cookie.
+app.use(cookieParser());
 
-if (!process.env.SMALLAPP_API_ADDR) {
-  const errMsg = 'SMALLAPP_API_ADDR environment variable is not defined';
-  console.error(errMsg);
-  throw new Error(errMsg);
-}
+app.use((req, _res, next) => {
+  if (!req.session.learner) {
+    req.session.learner = { id: '245', lesson: [] };
+  } else {
+    console.log('hello kind sir');
+  }
+  next();
+});
 
 // Starts an http server on the $PORT environment variable
 const PORT = process.env.PORT;
@@ -38,9 +51,15 @@ app.listen(PORT, () => {
   console.log('Press Ctrl+C to quit.');
 });
 
+const router = express.Router();
+app.use(router);
+router.use(bodyParser.urlencoded({ extended: false }));
+
 // Handles GET request to /
-router.get('/', async (_req, res) => {
-  // TODO check for auth cookie
+router.get('/', async (req, res) => {
+  const session = req.session;
+  console.log(JSON.stringify({ session }));
+
   // render the startup HTML template
   return await Promise.resolve()
     .then(() => {
