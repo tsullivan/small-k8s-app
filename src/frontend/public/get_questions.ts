@@ -1,7 +1,7 @@
 /*
  * This program was written by Tim Sullivan
  */
-import { QuestionFormat } from '../../types';
+import { QuestionFormat } from '../types';
 
 const OPERATORS = ['*', '+', '-'];
 

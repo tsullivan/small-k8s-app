@@ -2,7 +2,7 @@
  * This program was written by Tim Sullivan
  */
 
-import { QuestionFormat } from '../../types';
+import { QuestionFormat } from '../types';
 
 export class GameState {
   private _startTime: Date;

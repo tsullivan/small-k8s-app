@@ -4,7 +4,7 @@
 
 import { Observable, fromEvent } from 'rxjs';
 import { first, map } from 'rxjs/operators';
-import { QuestionFormat } from '../../types';
+import { QuestionFormat } from '../types';
 
 interface FormTemplates {
   askName: HTMLTemplateElement | null;
@@ -43,7 +43,8 @@ export class FormDriver {
     const [ answer, submit ] = Array.from(clone.querySelectorAll('input'));
     this.cardsBody.appendChild(clone);
 
-    return fromEvent(submit, 'click').pipe(first(), map(() => {
+    return fromEvent(submit, 'click').pipe(first(), map((ev) => {
+      ev.preventDefault();
       const name = answer.value || 'unknown';
       return name;
     }));

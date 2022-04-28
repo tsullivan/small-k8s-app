@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import type { Request } from 'express';
@@ -14,7 +14,7 @@ const app = express();
 
 const SMALLAPP_SESSION_SECRET = process.env.SMALLAPP_API_ADDR;
 const SMALLAPP_API_ADDR = process.env.SMALLAPP_API_ADDR;
-const BACKEND_URI = `http://${SMALLAPP_API_ADDR}/messages`;
+const BACKEND_URI = `http://${SMALLAPP_API_ADDR}/submit`;
 checkEnvironment();
 
 app.set('view engine', 'pug');
@@ -83,12 +83,7 @@ router.post(
       return;
     }
 
-    console.log([name]);
-
-    // send the new message to the backend and redirect to the homepage
-    console.log(`posting to ${BACKEND_URI}- name: ${name} body: ly58gthow96y`);
-
-    let response: { status: unknown } | null = null;
+    let response: AxiosResponse<LearnerSessionData> | null = null;
     try {
       response = await axios.post(BACKEND_URI, {
         name,
@@ -98,10 +93,11 @@ router.post(
         },
       });
     } catch (err) {
-      console.error('error: ' + err);
+      console.error(err);
+      return res.status(500);
     }
 
-    console.log(`response from ${BACKEND_URI}` + response?.status);
-    res.redirect('/');
+    console.log(`response from ${BACKEND_URI}: ` + response?.status);
+    res.json(response.data);
   }
 );
