@@ -1,13 +1,21 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import { MessagePayload } from '../types';
 import { Message } from './messages';
+import { getAssessmentTest } from './questions';
 
 export const router = express.Router();
 router.use(bodyParser.json());
 
-// Handles POST requests to /submit
-router.post('/submit', (req: express.Request<unknown, MessagePayload | object>, res) => {
+// Returns a set of stored questions for a user, or gives the assessment test
+router.get('/questions', (_req, res) => {
+  // Get the name of the user
+  // Find any stored questions for this user
+  const questions = getAssessmentTest(42);
+  // Return the questions
+  res.json(questions);
+});
+
+router.post('/submit', (req, res) => {
   try {
     const message = new Message({ name: req.body.name, body: req.body.body });
     message.create();

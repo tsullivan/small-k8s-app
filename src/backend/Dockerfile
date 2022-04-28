@@ -5,7 +5,7 @@ WORKDIR /backend
 
 # Copy package.json and install dependencies
 COPY package*.json ./
-RUN npm install --production
+RUN npm install --only=production
 
 # Copy rest of the application csource code
 COPY . .

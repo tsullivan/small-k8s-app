@@ -5,7 +5,7 @@ WORKDIR /frontend
 
 # Copy package.json and install dependencies
 COPY package*.json ./
-RUN npm install --production
+RUN npm install --only=production
 
 # Copy rest of the application csource code
 COPY . .
@@ -14,4 +14,4 @@ COPY . .
 RUN npm run build
 
 # Run the app
-ENTRYPOINT ["npx", "ts-node", "app/index.ts"]
+ENTRYPOINT ["npx", "ts-node", "app.ts"]

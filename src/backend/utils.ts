@@ -1,11 +1,12 @@
 /*
  * This program was written by Tim Sullivan
  */
-import { QuestionFormat } from '../types';
+
+type QuestionFormat = [number, string, number];
 
 const OPERATORS = ['*', '+', '-'];
 
-export function getNewQuestions(size: number): [number[], Array<QuestionFormat>] {
+export const getAssessmentTest = (size: number): [number[], Array<QuestionFormat>] => {
   const questions: Array<QuestionFormat> = [];
   const answers: number[] = [];
 
@@ -32,4 +33,4 @@ export function getNewQuestions(size: number): [number[], Array<QuestionFormat>]
   }
 
   return [answers, questions];
-}
+};

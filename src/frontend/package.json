@@ -4,7 +4,7 @@
   "description": "frontend",
   "scripts": {
     "build": "webpack",
-    "start": "node -r ts-node/register --inspect=9229 app/index.ts"
+    "start": "node -r ts-node/register --inspect=9229 app.ts"
   },
   "dependencies": {
     "axios": "0.26.1",

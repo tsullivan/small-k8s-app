@@ -10,7 +10,7 @@ export class GameState {
 
   private _name?: string;
   private _questions?: Array<QuestionFormat>;
-  private _gameAnswers?: number[];
+  private _guesses?: number[];
 
   constructor() {
     this._startTime = new Date(Date.now());
@@ -38,19 +38,26 @@ export class GameState {
     return this._questions;
   }
 
-  public set gameAnswers(gameAnswers: number[]) {
-    this._gameAnswers = gameAnswers;
+  public set guesses(gameAnswers: number[]) {
+    this._guesses = gameAnswers;
   }
 
-  public get gameAnswers() {
-    if (!this._gameAnswers) {
-      throw new Error('gameAnswers are not set');
+  public get guesses() {
+    if (!this._guesses) {
+      throw new Error('answers are not set');
     }
-    return this._gameAnswers;
+    return this._guesses;
   }
 
   public get startTime() {
     return this._startTime;
+  }
+
+  public get endTime() {
+    if (!this._endTime) {
+      throw new Error('Game state has not ended!');
+    }
+    return this._endTime;
   }
 
   public end() {
