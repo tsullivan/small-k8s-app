@@ -1,8 +1,7 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "description": "frontend",
   "scripts": {
     "build": "webpack",
     "start": "node -r ts-node/register --inspect=9229 app/index.ts"

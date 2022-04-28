@@ -7,6 +7,7 @@ import * as session from 'express-session';
 import * as path from 'path';
 import { checkEnvironment } from './env';
 import '../types';
+import { LearnerSessionData } from '../types';
 
 // initialize the app
 const app = express();
@@ -24,7 +25,7 @@ app.use(
     cookie: { maxAge: 86000 * 1000 },
     resave: true,
     saveUninitialized: true,
-    secret: SMALLAPP_SESSION_SECRET,
+    secret: SMALLAPP_SESSION_SECRET ?? [],
   })
 );
 
@@ -37,9 +38,11 @@ app.use(cookieParser());
 
 app.use((req, _res, next) => {
   if (!req.session.learner) {
-    req.session.learner = { id: '245', lesson: [] };
-  } else {
-    console.log('hello kind sir');
+    req.session.learner = {
+      name: null,
+      questions: [],
+      stage: null,
+    };
   }
   next();
 });
@@ -56,10 +59,7 @@ app.use(router);
 router.use(bodyParser.urlencoded({ extended: false }));
 
 // Handles GET request to /
-router.get('/', async (req, res) => {
-  const session = req.session;
-  console.log(JSON.stringify({ session }));
-
+router.get('/', async (_req, res) => {
   // render the startup HTML template
   return await Promise.resolve()
     .then(() => {
@@ -70,40 +70,38 @@ router.get('/', async (req, res) => {
     });
 });
 
-interface PostPayloadBody {
-  name: string;
-  message: string;
-}
-
 // Handles POST request to /post
-router.post('/post', (req: Request<unknown, unknown, PostPayloadBody>, res) => {
-  console.log(`received request: ${req.method} ${req.url}`);
+router.post(
+  '/post',
+  async (req: Request<unknown, unknown, LearnerSessionData>, res) => {
+    console.log(`received request: ${req.method} ${req.url}`);
 
-  // validate request
-  const name = req.body.name;
-  const message = req.body.message;
-  if (!name || name.length == 0) {
-    res.status(400).send('name is not specified');
-    return;
+    // validate request
+    const name = req.body.name;
+    if (!name || name.length == 0) {
+      res.status(400).send('name is not specified');
+      return;
+    }
+
+    console.log([name]);
+
+    // send the new message to the backend and redirect to the homepage
+    console.log(`posting to ${BACKEND_URI}- name: ${name} body: ly58gthow96y`);
+
+    let response: { status: unknown } | null = null;
+    try {
+      response = await axios.post(BACKEND_URI, {
+        name,
+        body: {
+          stage: 'one',
+          grade: 100,
+        },
+      });
+    } catch (err) {
+      console.error('error: ' + err);
+    }
+
+    console.log(`response from ${BACKEND_URI}` + response?.status);
+    res.redirect('/');
   }
-
-  if (!message || message.length == 0) {
-    res.status(400).send('message is not specified');
-    return;
-  }
-
-  // send the new message to the backend and redirect to the homepage
-  console.log(`posting to ${BACKEND_URI}- name: ${name} body: ${message}`);
-  axios
-    .post(BACKEND_URI, {
-      name: name,
-      body: message,
-    })
-    .then((response) => {
-      console.log(`response from ${BACKEND_URI}` + response.status);
-      res.redirect('/');
-    })
-    .catch((error) => {
-      console.error('error: ' + error);
-    });
-});
+);

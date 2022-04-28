@@ -13,5 +13,5 @@ COPY . .
 # Compile the bundle
 RUN npm run build
 
-# Run app.js
+# Run the app
 ENTRYPOINT ["npx", "ts-node", "app/index.ts"]
