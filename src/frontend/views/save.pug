@@ -1,7 +1,5 @@
-<template id="saveTemplate">
-  <div class="cards__item">
-    <form>
-      <input type="submit" value="Save" />
-    </form>
-  </div>
-</template>
+template#saveTemplate
+  div.cards__item
+    form.form-inline(action="/post", method="POST")
+      button.btn.btn-primary.mb-2(type="submit") Save
+
