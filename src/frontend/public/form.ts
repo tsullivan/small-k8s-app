@@ -137,7 +137,7 @@ export class FormDriver {
       cellQuestion.textContent = `${newFirst} ${operator} ${last}`;
       cellGuess.textContent = data.guesses[i].toString();
       cellCorrect.textContent =
-        data.answers[i] === data.guesses[i] ? 'Yes' : `No: ${data.answers[i]}`;
+        data.answers[i] === data.guesses[i] ? 'Yes: 🙌' : `No: ${data.answers[i]}`;
 
       tableRow?.appendChild(cellQuestion);
       tableRow?.appendChild(cellGuess);
