@@ -1,7 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import { Message } from './messages';
-import { getAssessmentTest } from './questions';
+import { Message } from '../lib/messages';
+import { getAssessmentTest } from '../lib/questions';
 
 export const router = express.Router();
 router.use(bodyParser.json());
@@ -10,7 +10,7 @@ router.use(bodyParser.json());
 router.get('/questions', (_req, res) => {
   // Get the name of the user
   // Find any stored questions for this user
-  const questions = getAssessmentTest(42);
+  const questions = getAssessmentTest(3); // FIXME make it 42
   // Return the questions
   res.json(questions);
 });

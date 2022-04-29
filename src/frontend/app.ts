@@ -1,10 +1,8 @@
-import axios from 'axios';
-import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as session from 'express-session';
 import * as path from 'path';
-import { LearnerSessionData, QuestionFormat } from './types';
+import { registerRoutes } from './routes';
 
 // Application will fail if environment variables are not set
 const checkEnvironment = () => {
@@ -31,8 +29,6 @@ const checkEnvironment = () => {
 const app = express();
 
 const SMALLAPP_SESSION_SECRET = process.env.SMALLAPP_API_ADDR;
-const SMALLAPP_API_ADDR = process.env.SMALLAPP_API_ADDR;
-const BACKEND_URI_GETQUESTIONS = `http://${SMALLAPP_API_ADDR}/questions`;
 checkEnvironment();
 
 app.set('view engine', 'pug');
@@ -74,80 +70,5 @@ app.listen(PORT, () => {
 
 const router = express.Router();
 app.use(router);
-router.use(bodyParser.urlencoded({ extended: false }));
 
-// Handles GET request to /
-router.get('/', async (_req, res) => {
-  // render the startup HTML template
-  res.render('home');
-});
-
-// Handles POST request to /post
-router.post('/post', async (req, res) => {
-  console.log(`received request: ${req.method} ${req.url}`);
-
-  if (!req.session.learner) {
-    throw new Error('No session!');
-  }
-
-  // validate request
-  const name: string = req.body.name;
-  if (!name || name.length == 0) {
-    return res.status(400).send('name is not specified');
-  }
-
-  req.session.learner.name = name;
-
-  // receive questions for user
-  let answers: Array<number> | null = null;
-  let questions: Array<QuestionFormat> | null = null;
-  try {
-    const response = await axios.get(BACKEND_URI_GETQUESTIONS);
-    console.log(`response from ${BACKEND_URI_GETQUESTIONS}: ` + response.status);
-
-    // store the questions and answers in the user session
-    const result: [Array<number>, Array<QuestionFormat>] = response.data;
-    [answers, questions] = result;
-    req.session.learner.questions = questions;
-    req.session.learner.answers = answers;
-  } catch (error) {
-    console.error('error receiving questions: ' + error);
-  }
-  const response: LearnerSessionData = {
-    name: req.session.learner?.name,
-    questions,
-    // do not send the answers to the client
-  };
-
-  return res.json(response);
-});
-
-// Handles POST request to /submit
-router.post('/submit', (req, res) => {
-  console.log(`received request: ${req.method} ${req.url}`);
-
-  const guesses = req.body.guesses;
-  if (!guesses) {
-    throw new Error('No guesses!');
-  }
-
-  if (!req.session.learner) {
-    throw new Error('No session!');
-  }
-
-  req.session.learner.guesses = guesses;
-
-  // TODO: Calculate a grade
-  const grade = 0.999;
-  // TODO: Send the results to the backend server
-
-  const response: LearnerSessionData = {
-    name: req.session.learner?.name,
-    questions: req.session?.learner.questions,
-    answers: req.session?.learner.answers,
-    guesses,
-    grade,
-  };
-
-  res.json(response);
-});
+registerRoutes(router);

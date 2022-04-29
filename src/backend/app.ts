@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { router } from './routes';
-import { connectToMongoDB } from './routes/messages';
+import { connectToMongoDB } from './lib/messages';
 
 const PORT = process.env.PORT;
 
