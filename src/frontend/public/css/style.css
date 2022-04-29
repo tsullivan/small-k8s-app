@@ -23,19 +23,6 @@ p {
     position: relative;
 }
 
-@media (min-width: 1200px) {
-    .container {
-        max-width: 900px;
-        padding: 50px;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 a {
-        font-size: 40px;
-    }
-}
-
 .cards {
   display: flex;
 

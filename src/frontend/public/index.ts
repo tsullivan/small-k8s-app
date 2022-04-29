@@ -48,14 +48,15 @@ async function main() {
   if (!gameGuesses$) {
     throw new Error('Unrecoverable error');
   }
-  state.guesses = await firstValueFrom(gameGuesses$);
+  const guesses = await firstValueFrom(gameGuesses$);
 
   // Clear the screen
   form.clear();
 
   const { data: submitResponse } = await axios.post<LearnerSessionData>('/submit', {
-    guesses: state.guesses,
+    guesses,
   });
+
   if (!submitResponse.time) {
     throw new Error('Invalid post response!');
   }

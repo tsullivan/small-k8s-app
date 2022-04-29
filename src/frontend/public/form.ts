@@ -18,16 +18,19 @@ interface FormTemplates {
 export class FormDriver {
   private appBody: Element;
   private helloBody: Element;
+  private scorecardBody: Element;
   private templates: FormTemplates;
 
   constructor() {
     const appBody = document.querySelector('.app');
     const helloBody = document.querySelector('.app-hello');
-    if (!appBody || !helloBody) {
+    const scorecardBody = document.querySelector('.app-scorecard');
+    if (!appBody || !helloBody || !scorecardBody) {
       throw new Error('Page error! App container not found');
     }
     this.appBody = appBody;
     this.helloBody = helloBody;
+    this.scorecardBody = scorecardBody;
     this.templates = {
       askName: document.querySelector('#askNameTemplate'),
       cardItem: document.querySelector('#cardItemTemplate'),
@@ -66,7 +69,7 @@ export class FormDriver {
     );
   }
 
-  public addHello(name: string, startTime: Date): void {
+  public addHello(name: string, startTime: Date) {
     const clone = this.getTemplate('hello');
     const p = clone.querySelectorAll('p');
     p[0].innerText = `Hello, ${name}!`;
@@ -111,9 +114,10 @@ export class FormDriver {
   public addFinish(data: LearnerSessionData) {
     const clone = this.getTemplate('finish');
     const p = clone.querySelectorAll('p');
-    p[0].innerText = `Hello, ${data.name}!`;
-    p[1].innerText = `You finished in ${data.time}ms`; // FIXME format the time
-    p[2].innerText = `Your grade: ${data.grade}`;
+    p[0].innerText = `You finished in ${data.time}ms`; // FIXME format the time
+    p[1].innerText = `Your grade: ${data.grade}`;
+
+    this.helloBody.innerHTML = '';
     this.appBody.append(clone);
   }
 
@@ -127,18 +131,24 @@ export class FormDriver {
 
     for (let i = 0; i < data.questions.length; i++) {
       const tableRow = document.createElement('tr');
+      tableRow.className = 'cucunano__cellRow';
+
       const [cellQuestion, cellGuess, cellCorrect] = [
         document.createElement('td'),
         document.createElement('td'),
         document.createElement('td'),
       ];
 
+      cellQuestion.className = 'cucunano__cell';
+      cellGuess.className = 'cucunano__cell';
+      cellCorrect.className = 'cucunano__cell';
+
       const [newFirst, operator, last] = data.questions[i];
       const guess = data.guesses[i];
       cellQuestion.textContent = `${newFirst} ${operator} ${last}`;
       cellGuess.textContent = guess?.toString() || '-';
       cellCorrect.textContent =
-        data.answers[i] === data.guesses[i] ? 'Yes: 🙌' : `No: ${data.answers[i]}`;
+        data.answers[i] === data.guesses[i] ? 'Yes: 🙌' : `No: ${data.answers[i]} 😿`;
 
       tableRow?.appendChild(cellQuestion);
       tableRow?.appendChild(cellGuess);
@@ -146,6 +156,6 @@ export class FormDriver {
       scoreTable?.appendChild(tableRow);
     }
 
-    this.appBody.append(clone);
+    this.scorecardBody.append(clone);
   }
 }

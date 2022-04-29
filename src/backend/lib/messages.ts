@@ -55,6 +55,9 @@ export class Message {
       throw validationError;
     }
     this.save(this.message);
+
+    // TODO
+    console.log('calculating next lesson...');
   }
 
   private save(doc: mongoose.Document) {
