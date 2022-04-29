@@ -19,8 +19,6 @@ export const registerRoute = (router: Router) => {
       return res.status(400).send('name is not specified');
     }
 
-    req.session.learner.name = name;
-
     // receive questions for user
     let answers: Array<number> | null = null;
     let questions: Array<QuestionFormat> | null = null;
@@ -31,14 +29,22 @@ export const registerRoute = (router: Router) => {
       // store the questions and answers in the user session
       const result: [Array<number>, Array<QuestionFormat>] = response.data;
       [answers, questions] = result;
-      req.session.learner.questions = questions;
-      req.session.learner.answers = answers;
     } catch (error) {
       console.error('error receiving questions: ' + error);
     }
+
+    // populate session data
+    req.session.learner.name = name;
+    req.session.learner.questions = questions;
+    req.session.learner.answers = answers;
+
+    const startTime = new Date(Date.now());
+    req.session.learner.startTime = startTime;
+
     const response: LearnerSessionData = {
-      name: req.session.learner?.name,
+      name,
       questions,
+      startTime,
       // do not send the answers to the client
     };
 

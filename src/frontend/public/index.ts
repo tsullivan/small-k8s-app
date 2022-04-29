@@ -28,25 +28,20 @@ async function main() {
   state.name = await firstValueFrom(name$);
 
   // sync the name to the server, retrieve the set of questions
-  {
-    const postResponse = await axios.post<LearnerSessionData>('/post', {
-      name: state.name,
-      questions: [],
-    });
-    console.log({ postResponse: postResponse.data });
-
-    // Say hello
-    form.clear();
-    form.addHello(state.name, state.startTime);
-
-    // Make some questions
-    if (!postResponse.data.questions) {
-      throw new Error('Could not get questions!');
-    }
-    state.questions = postResponse.data.questions;
+  const { data: postResponse } = await axios.post<LearnerSessionData>('/post', {
+    name: state.name,
+    questions: [],
+  });
+  if (!postResponse.name || !postResponse.startTime || !postResponse.questions) {
+    throw new Error('Invalid post response!');
   }
 
-  form.showQuestions(state.questions);
+  // Say hello
+  form.clear();
+  form.addHello(state.name, postResponse.startTime);
+
+  // Display questions
+  form.showQuestions(postResponse.questions);
 
   // Let them save
   const gameGuesses$ = form.getGuesses();
@@ -54,20 +49,20 @@ async function main() {
     throw new Error('Unrecoverable error');
   }
   state.guesses = await firstValueFrom(gameGuesses$);
-  state.end();
-  console.log(state.guesses);
 
   // Clear the screen
   form.clear();
-  form.addFinish(state.name, state.endTime);
 
-  const submitResponse = await axios.post<LearnerSessionData>('/submit', {
+  const { data: submitResponse } = await axios.post<LearnerSessionData>('/submit', {
     guesses: state.guesses,
   });
-  console.log({ submitResponse: submitResponse.data });
+  if (!submitResponse.time) {
+    throw new Error('Invalid post response!');
+  }
 
+  // Show their time and grade
+  form.addFinish(submitResponse);
 
   // Show their guesses and the answers
-  // Show a scorecard with their name
-  form.addScorecard();
+  form.addScorecard(submitResponse);
 }

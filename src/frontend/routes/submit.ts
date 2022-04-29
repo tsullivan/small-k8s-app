@@ -10,20 +10,22 @@ export const registerRoute = (router: Router) => {
       throw new Error('No guesses!');
     }
 
-    if (!req.session.learner || !req.session.learner.answers) {
-      throw new Error('No session!');
+    if (
+      !req.session.learner ||
+      !req.session.learner.answers ||
+      !req.session.learner.startTime
+    ) {
+      throw new Error('Incomplete session!');
     }
 
+    // Calculate time taken
+    const endTime = new Date(Date.now());
+    const time = endTime.valueOf() - new Date(req.session.learner.startTime).valueOf();
     // Calculate a grade
     const answers = req.session.learner.answers;
     req.session.learner.guesses = guesses;
-    const correct = answers.filter((answer, index) => {
-      const isCorrect = answer === guesses[index];
-      console.log('index, answer, guess, isCorrect', [index, answer, guesses[index], isCorrect]);
-      return isCorrect;
-    });
+    const correct = answers.filter((answer, index) => answer === guesses[index]);
     const grade = correct.length / answers.length;
-    console.log(`number correct: ${correct.length}, out of total: ${answers.length}. grade: ${grade}`);
 
     // TODO: Send the results to the backend server
 
@@ -32,6 +34,7 @@ export const registerRoute = (router: Router) => {
       questions: req.session?.learner.questions,
       answers: req.session?.learner.answers,
       guesses,
+      time,
       grade,
     };
 

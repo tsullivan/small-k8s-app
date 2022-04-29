@@ -5,16 +5,9 @@
 import { QuestionFormat } from '../types';
 
 export class GameState {
-  private _startTime: Date;
-  private _endTime?: Date;
-
   private _name?: string;
   private _questions?: Array<QuestionFormat>;
   private _guesses?: number[];
-
-  constructor() {
-    this._startTime = new Date(Date.now());
-  }
 
   public set name(name: string) {
     this._name = name;
@@ -48,25 +41,4 @@ export class GameState {
     }
     return this._guesses;
   }
-
-  public get startTime() {
-    return this._startTime;
-  }
-
-  public get endTime() {
-    if (!this._endTime) {
-      throw new Error('Game state has not ended!');
-    }
-    return this._endTime;
-  }
-
-  public end() {
-    this._endTime = new Date(Date.now());
-  }
-
-  public scoreSheet() {
-    this._endTime;
-    this._startTime;
-  }
 }
-

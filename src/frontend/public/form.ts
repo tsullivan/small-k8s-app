@@ -4,7 +4,7 @@
 
 import { Observable, fromEvent } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { QuestionFormat } from '../types';
+import { LearnerSessionData, QuestionFormat } from '../types';
 
 interface FormTemplates {
   askName: HTMLTemplateElement | null;
@@ -16,17 +16,17 @@ interface FormTemplates {
 }
 
 export class FormDriver {
-  private cardsBody: Element;
+  private appBody: Element;
   private helloBody: Element;
   private templates: FormTemplates;
 
   constructor() {
-    const cardsBody = document.querySelector('.cards');
-    const helloBody = document.querySelector('.hello');
-    if (!cardsBody || !helloBody) {
+    const appBody = document.querySelector('.app');
+    const helloBody = document.querySelector('.app-hello');
+    if (!appBody || !helloBody) {
       throw new Error('Page error! App container not found');
     }
-    this.cardsBody = cardsBody;
+    this.appBody = appBody;
     this.helloBody = helloBody;
     this.templates = {
       askName: document.querySelector('#askNameTemplate'),
@@ -39,16 +39,23 @@ export class FormDriver {
   }
 
   public clear() {
-    this.cardsBody.innerHTML = '';
+    this.appBody.innerHTML = '';
+  }
+
+  private getTemplate(template: keyof typeof this.templates): ParentNode {
+    const clone = this.templates[template]?.content.cloneNode(
+      true
+    ) as ParentNode | null;
+    if (!clone) {
+      throw new Error(`invalid template: ${template}`);
+    }
+    return clone;
   }
 
   public askName(): Observable<string> | void {
-    const clone = this.templates?.askName?.content.cloneNode(true) as ParentNode | null;
-    if (!clone) {
-      return;
-    }
+    const clone = this.getTemplate('askName');
     const [answer, submit] = Array.from(clone.querySelectorAll('input'));
-    this.cardsBody.appendChild(clone);
+    this.appBody.appendChild(clone);
 
     return fromEvent(submit, 'click').pipe(
       map((ev) => {
@@ -72,13 +79,13 @@ export class FormDriver {
 
     for (let i = 0; i < size; i++) {
       const clone = this.getTemplate('cardItem');
-      const question = clone.querySelector('span.question');
+      const question = clone.querySelector('span.app-question');
       if (!question) {
         return;
       }
       const [newFirst, operator, last] = questions[i];
       question.textContent = `${newFirst} ${operator} ${last}`;
-      this.cardsBody.appendChild(clone);
+      this.appBody.appendChild(clone);
     }
   }
 
@@ -88,7 +95,7 @@ export class FormDriver {
     if (!submit) {
       return;
     }
-    this.cardsBody.append(clone);
+    this.appBody.append(clone);
     return fromEvent(submit, 'click').pipe(
       map((ev) => {
         ev.preventDefault();
@@ -101,24 +108,43 @@ export class FormDriver {
     );
   }
 
-  public addFinish(name: string, endTime: Date) {
+  public addFinish(data: LearnerSessionData) {
     const clone = this.getTemplate('finish');
     const p = clone.querySelectorAll('p');
-    p[0].innerText = `Hello, ${name}!`;
-    p[1].innerText = `You finished at ${endTime}`; // FIXME format the time
-    this.cardsBody.append(clone);
+    p[0].innerText = `Hello, ${data.name}!`;
+    p[1].innerText = `You finished in ${data.time}ms`; // FIXME format the time
+    p[2].innerText = `Your grade: ${data.grade}`;
+    this.appBody.append(clone);
   }
 
-  private getTemplate(template: keyof typeof this.templates): ParentNode {
-    const clone = this.templates[template]?.content.cloneNode(true) as ParentNode | null;
-    if (!clone) {
-      throw new Error(`invalid template: ${template}`);
-    }
-    return clone;
-  }
-
-  public addScorecard() {
+  public addScorecard(data: LearnerSessionData) {
     const clone = this.getTemplate('scorecard');
-    this.cardsBody.append(clone);
+    const scoreTable = clone.querySelector('tbody');
+
+    if (!data.questions || !data.answers || !data.guesses) {
+      throw new Error('Invalid session!');
+    }
+
+    for (let i = 0; i < data.questions.length; i++) {
+      const tableRow = document.createElement('tr');
+      const [cellQuestion, cellGuess, cellCorrect] = [
+        document.createElement('td'),
+        document.createElement('td'),
+        document.createElement('td'),
+      ];
+
+      const [newFirst, operator, last] = data.questions[i];
+      cellQuestion.textContent = `${newFirst} ${operator} ${last}`;
+      cellGuess.textContent = data.guesses[i].toString();
+      cellCorrect.textContent =
+        data.answers[i] === data.guesses[i] ? 'Yes' : `No: ${data.answers[i]}`;
+
+      tableRow?.appendChild(cellQuestion);
+      tableRow?.appendChild(cellGuess);
+      tableRow?.appendChild(cellCorrect);
+      scoreTable?.appendChild(tableRow);
+    }
+
+    this.appBody.append(clone);
   }
 }

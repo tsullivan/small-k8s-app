@@ -10,6 +10,8 @@ export interface LearnerSessionData {
   stage?: string | null;
   answers?: number[] | null;
   guesses?: number[] | null;
+  startTime?: Date;
+  time?: number;
   grade?: number;
 }
 
