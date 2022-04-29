@@ -29,4 +29,7 @@ spec:
         - name: SMALLAPP_API_ADDR
           value: nodejs-smallapp-backend:8080
         - name: SMALLAPP_SESSION_SECRET
-          value: "fixmedontgetbetwixtme"
+          valueFrom:
+            secretKeyRef:
+              name: small-app-frontend-secrets
+              key: session
