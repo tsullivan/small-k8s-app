@@ -17,14 +17,17 @@ interface FormTemplates {
 
 export class FormDriver {
   private cardsBody: Element;
+  private helloBody: Element;
   private templates: FormTemplates;
 
   constructor() {
     const cardsBody = document.querySelector('.cards');
-    if (!cardsBody) {
-      throw new Error('Page error! cards container not found');
+    const helloBody = document.querySelector('.hello');
+    if (!cardsBody || !helloBody) {
+      throw new Error('Page error! App container not found');
     }
     this.cardsBody = cardsBody;
+    this.helloBody = helloBody;
     this.templates = {
       askName: document.querySelector('#askNameTemplate'),
       cardItem: document.querySelector('#cardItemTemplate'),
@@ -61,7 +64,7 @@ export class FormDriver {
     const p = clone.querySelectorAll('p');
     p[0].innerText = `Hello, ${name}!`;
     p[1].innerText = `You started at ${startTime}`; // FIXME format the time
-    this.cardsBody.append(clone);
+    this.helloBody.append(clone);
   }
 
   public showQuestions(questions: Array<QuestionFormat>) {

@@ -2,7 +2,7 @@ import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as session from 'express-session';
 import * as path from 'path';
-import { registerRoutes } from './routes';
+import { router } from './routes';
 
 // Application will fail if environment variables are not set
 const checkEnvironment = () => {
@@ -68,7 +68,4 @@ app.listen(PORT, () => {
   console.log('Press Ctrl+C to quit.');
 });
 
-const router = express.Router();
 app.use(router);
-
-registerRoutes(router);

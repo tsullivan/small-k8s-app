@@ -10,14 +10,21 @@ export const registerRoute = (router: Router) => {
       throw new Error('No guesses!');
     }
 
-    if (!req.session.learner) {
+    if (!req.session.learner || !req.session.learner.answers) {
       throw new Error('No session!');
     }
 
+    // Calculate a grade
+    const answers = req.session.learner.answers;
     req.session.learner.guesses = guesses;
+    const correct = answers.filter((answer, index) => {
+      const isCorrect = answer === guesses[index];
+      console.log('index, answer, guess, isCorrect', [index, answer, guesses[index], isCorrect]);
+      return isCorrect;
+    });
+    const grade = correct.length / answers.length;
+    console.log(`number correct: ${correct.length}, out of total: ${answers.length}. grade: ${grade}`);
 
-    // TODO: Calculate a grade
-    const grade = 0.999;
     // TODO: Send the results to the backend server
 
     const response: LearnerSessionData = {
