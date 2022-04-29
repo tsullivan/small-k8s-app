@@ -23,34 +23,33 @@ export const connectToMongoDB = async () => {
   });
 };
 
-const messageSchema = new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Name is required'] },
-  body: { type: Object, required: [true, 'Message Body is required'] },
-  timestamps: {},
+  questions: [{ type: mongoose.Schema.Types.Mixed }], // [[Number, String, Number]]
+  answers: [Number],
+  guesses: [Number],
+  time: Number,
+  grade: Number,
+  date: { type: Date, default: Date.now },
 });
 
-export const messageModel = mongoose.model('Message', messageSchema);
+export const MessageModel = mongoose.model('Message', MessageSchema);
 
 // Constructs and saves message
 
 export class Message {
-  private name: string;
-  private body: { date: Date; stage: string | null; grade: number; };
+  private payload: MessagePayload;
   private message: mongoose.Document<unknown, unknown, MessagePayload>;
 
   constructor(params: MessagePayload) {
     if (params.name == null) {
       throw new Error('name param is not provided!');
     }
-    this.name = params.name;
-    this.body = {
-      ...params.body,
-      date: new Date(Date.now()),
-    };
-    this.message = new messageModel({ name: this.name, body: this.body });
+    this.payload = params;
+    this.message = new MessageModel(this.payload);
   }
 
-  public create () {
+  public create() {
     const validationError = this.message.validateSync();
     if (validationError) {
       throw validationError;
@@ -58,7 +57,7 @@ export class Message {
     this.save(this.message);
   }
 
-  private save (doc: mongoose.Document) {
+  private save(doc: mongoose.Document) {
     console.log('saving message...');
     doc.save((err) => {
       if (err) {
@@ -66,5 +65,4 @@ export class Message {
       }
     });
   }
-
 }

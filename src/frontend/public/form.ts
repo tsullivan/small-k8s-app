@@ -134,8 +134,9 @@ export class FormDriver {
       ];
 
       const [newFirst, operator, last] = data.questions[i];
+      const guess = data.guesses[i];
       cellQuestion.textContent = `${newFirst} ${operator} ${last}`;
-      cellGuess.textContent = data.guesses[i].toString();
+      cellGuess.textContent = guess?.toString() || '-';
       cellCorrect.textContent =
         data.answers[i] === data.guesses[i] ? 'Yes: 🙌' : `No: ${data.answers[i]}`;
 

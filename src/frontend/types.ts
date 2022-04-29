@@ -7,9 +7,8 @@ export type QuestionFormat = [number, string, number];
 export interface LearnerSessionData {
   name: string | null;
   questions: Array<QuestionFormat> | null;
-  stage?: string | null;
   answers?: number[] | null;
-  guesses?: number[] | null;
+  guesses?: Array<number | null> | null;
   startTime?: Date;
   time?: number;
   grade?: number;

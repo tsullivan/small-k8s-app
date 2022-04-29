@@ -1,9 +1,10 @@
-interface LearnerResultSet {
-  name: string | null;
-  body: {
-    stage: string | null;
-    grade: number;
-  };
-}
+export type QuestionFormat = [number, string, number];
 
-export type MessagePayload = LearnerResultSet;
+export interface MessagePayload {
+  name: string | null;
+  questions: Array<QuestionFormat> | null;
+  answers?: number[] | null;
+  guesses?: number[] | null;
+  time?: number;
+  grade?: number;
+}
